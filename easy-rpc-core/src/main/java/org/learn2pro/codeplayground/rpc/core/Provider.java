@@ -1,4 +1,4 @@
-package org.learn2pro.codeplaygroud.rpc.core;
+package org.learn2pro.codeplayground.rpc.core;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,5 +13,5 @@ public @interface Provider {
      *
      * @return name desc
      */
-    String name() default "";
+    String value() default "";
 }

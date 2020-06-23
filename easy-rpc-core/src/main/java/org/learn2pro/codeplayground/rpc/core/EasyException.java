@@ -1,4 +1,4 @@
-package org.learn2pro.codeplaygroud.rpc.core;
+package org.learn2pro.codeplayground.rpc.core;
 
 /**
  * the base easy rpc exception

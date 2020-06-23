@@ -1,4 +1,6 @@
-package org.learn2pro.codeplaygroud.rpc.core;
+package org.learn2pro.codeplayground.rpc.core;
+
+import java.lang.reflect.Proxy;
 
 public interface Repository {
     /**
@@ -9,4 +11,5 @@ public interface Repository {
      * @return the singleton instance in jvm
      */
     <T> T getByName(String name) throws Exception;
+
 }

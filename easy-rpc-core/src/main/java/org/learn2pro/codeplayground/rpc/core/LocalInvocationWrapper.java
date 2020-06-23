@@ -1,12 +1,31 @@
-package org.learn2pro.codeplaygroud.rpc.core;
+package org.learn2pro.codeplayground.rpc.core;
 
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 public class LocalInvocationWrapper implements InvocationHandler {
+
+    /**
+     * the target bean name
+     */
+    private String targetName;
+
+    public LocalInvocationWrapper(String targetName) {
+        this.targetName = targetName;
+    }
+
+    public String getTargetName() {
+        return targetName;
+    }
+
+    public void setTargetName(String targetName) {
+        this.targetName = targetName;
+    }
+
     /**
      * invoke the rpc method from local
      *
@@ -18,11 +37,12 @@ public class LocalInvocationWrapper implements InvocationHandler {
      */
     public Object invoke(Object proxy, Method method, Object[] args) throws EasyException {
         try {
-            Class<?> klazz = proxy.getClass();
-            Object provider = ProviderRepository.getInstance().getByName(StringUtils.uncapitalize(klazz.getSimpleName()));
+            Object provider = ProviderRepository.getInstance().getByName(targetName);
             return ReflectionUtils.invokeMethod(method, provider, args);
         } catch (Exception e) {
-            throw new EasyInvokeException("invoke failed,in class:,method:,args:", e);
+            throw new EasyInvokeException("invoke failed,in class:" + proxy.getClass().getSimpleName() + ",method:" + method.getName() + ",args:" + Arrays.toString(args), e);
         }
     }
+
+
 }

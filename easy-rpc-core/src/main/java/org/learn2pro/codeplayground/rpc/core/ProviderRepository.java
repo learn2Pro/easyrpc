@@ -1,4 +1,4 @@
-package org.learn2pro.codeplaygroud.rpc.core;
+package org.learn2pro.codeplayground.rpc.core;
 
 import com.google.common.base.Preconditions;
 import org.springframework.beans.BeansException;
@@ -29,6 +29,7 @@ public class ProviderRepository implements Repository, ApplicationContextAware {
         Preconditions.checkArgument(app != null, "app context is empty,pls check!");
         return (T) app.getBean(name);
     }
+
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
