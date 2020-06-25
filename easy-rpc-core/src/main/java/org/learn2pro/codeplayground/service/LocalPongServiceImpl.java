@@ -9,9 +9,10 @@ import org.springframework.stereotype.Service;
  */
 @Service("localPongService")
 public class LocalPongServiceImpl implements PongService {
-    @Override
-    public String say() {
-        System.out.println("say local rpc hello!");
-        return "say local rpc hello!";
-    }
+
+  @Override
+  public String say() {
+    System.out.println("say local rpc hello!");
+    return "say local rpc hello!";
+  }
 }

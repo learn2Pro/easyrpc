@@ -5,7 +5,7 @@ package org.learn2pro.codeplayground.rpc.core;
  */
 public class EasyException extends RuntimeException {
 
-    public EasyException(String msg, Throwable parent) {
-        super(msg, parent);
-    }
+  public EasyException(String msg, Throwable parent) {
+    super(msg, parent);
+  }
 }

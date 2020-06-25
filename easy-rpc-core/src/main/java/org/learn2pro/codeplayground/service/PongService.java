@@ -6,5 +6,6 @@ package org.learn2pro.codeplayground.service;
  * @DATE: 2020/6/23
  */
 public interface PongService {
-    String say();
+
+  String say();
 }

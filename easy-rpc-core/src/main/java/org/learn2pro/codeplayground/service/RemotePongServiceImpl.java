@@ -1,6 +1,6 @@
 package org.learn2pro.codeplayground.service;
 
-import org.learn2pro.codeplayground.rpc.core.Provider;
+import org.learn2pro.codeplayground.rpc.core.ann.Provider;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,9 +11,10 @@ import org.springframework.stereotype.Service;
 @Provider("remotePongService")
 @Service
 public class RemotePongServiceImpl implements PongService {
-    @Override
-    public String say() {
-        System.out.println("say remote rpc hello!");
-        return "say remote rpc hello!";
-    }
+
+  @Override
+  public String say() {
+    System.out.println("say remote rpc hello!");
+    return "say remote rpc hello!";
+  }
 }

@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class PingPongServiceTest extends AbsBaseSpringTest {
 
-    @Autowired
-    private PingService pingService;
+  @Autowired
+  private PingService pingService;
 
-    @Test
-    public void pingTest0() {
-        pingService.ping();
-    }
+  @Test
+  public void pingTest0() {
+    pingService.ping();
+  }
 }
