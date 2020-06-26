@@ -1,9 +1,9 @@
-package org.learn2pro.codeplayground.rpc.core;
+package org.learn2pro.codeplayground.rpc.codec;
 
 import org.learn2pro.codeplayground.rpc.model.RpcSerModel;
 
 /**
- * name:org.learn2pro.codeplayground.rpc.core.CodecProcessor author:tderong date:2020/6/25
+ * name:org.learn2pro.codeplayground.rpc.codec.CodecProcessor author:tderong date:2020/6/25
  */
 public interface CodecProcessor<T extends RpcSerModel> {
 
