@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
  * @DATE: 2020/6/23
  */
 @Provider("remotePongService")
-@Service
+@Service("remotePongService")
 public class RemotePongServiceImpl implements PongService {
 
   @Override

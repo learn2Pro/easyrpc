@@ -1,6 +1,6 @@
 package org.learn2pro.codeplayground.rpc.config;
 
-import org.learn2pro.codeplayground.rpc.core.ann.CodecType;
+import org.learn2pro.codeplayground.rpc.core.enumerate.CodecType;
 import org.learn2pro.codeplayground.rpc.server.RemoteAddr;
 
 /**
@@ -23,6 +23,13 @@ public interface RpcConfigServer {
    * @param service the service
    */
   void register(RemoteAddr addr, String service, Class<?> klass);
+
+  /**
+   * unregister the provider
+   *
+   * @param addr the current addr
+   */
+  void unregister(RemoteAddr addr);
 
   /**
    * current codec type

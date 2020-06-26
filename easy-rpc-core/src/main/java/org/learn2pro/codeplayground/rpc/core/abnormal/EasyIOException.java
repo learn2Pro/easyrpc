@@ -1,6 +1,12 @@
-package org.learn2pro.codeplayground.rpc.core;
+package org.learn2pro.codeplayground.rpc.core.abnormal;
+
+import org.learn2pro.codeplayground.rpc.core.abnormal.EasyException;
 
 public class EasyIOException extends EasyException {
+
+  public EasyIOException(String msg) {
+    super(msg);
+  }
 
   /**
    * constructor with io exception

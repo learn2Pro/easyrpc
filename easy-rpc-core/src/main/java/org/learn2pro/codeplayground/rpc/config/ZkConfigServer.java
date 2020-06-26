@@ -16,4 +16,9 @@ public class ZkConfigServer implements RpcConfigServer {
   public void register(RemoteAddr addr, String service, Class<?> klass) {
   }
 
+  @Override
+  public void unregister(RemoteAddr addr) {
+
+  }
+
 }

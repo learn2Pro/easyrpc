@@ -1,6 +1,7 @@
 package org.learn2pro.codeplayground.service;
 
 import org.learn2pro.codeplayground.rpc.core.ann.Consumer;
+import org.learn2pro.codeplayground.rpc.core.enumerate.ProviderType;
 
 /**
  * @PACKAGE: org.learn2pro.codeplayground.service
@@ -9,7 +10,7 @@ import org.learn2pro.codeplayground.rpc.core.ann.Consumer;
  */
 public class PingService {
 
-  @Consumer("remotePongService")
+  @Consumer(value = "remotePongService",typo = ProviderType.REMOTE)
   private PongService pongService;
 
   public void ping() {

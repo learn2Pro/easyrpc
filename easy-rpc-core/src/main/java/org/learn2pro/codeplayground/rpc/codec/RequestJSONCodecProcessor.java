@@ -1,4 +1,4 @@
-package org.learn2pro.codeplayground.rpc.core;
+package org.learn2pro.codeplayground.rpc.codec;
 
 import com.alibaba.fastjson.JSON;
 import org.learn2pro.codeplayground.rpc.core.ann.Codec;

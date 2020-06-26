@@ -1,7 +1,5 @@
 package org.learn2pro.codeplayground.rpc.model;
 
-import java.lang.reflect.Method;
-
 /**
  * name:org.learn2pro.codeplayground.rpc.model.RpcRequest author:tderong date:2020/6/25
  */
@@ -10,15 +8,19 @@ public class RpcRequest implements RpcSerModel {
   /**
    * the rpc unique id
    */
-  private String id;
+  private String sessionId;
+  /**
+   * the service id
+   */
+  private String serviceId;
   /**
    * the class for invocation
    */
-  private Class<?> klazz;
+  private Class<?> klass;
   /**
    * the method to call
    */
-  private Method method;
+  private String method;
   /**
    * arg classes
    */
@@ -31,35 +33,45 @@ public class RpcRequest implements RpcSerModel {
   public RpcRequest() {
   }
 
-  public RpcRequest(String id, Class<?> klazz, Method method, Class<?>[] argKlazz, Object[] args) {
-    this.id = id;
-    this.klazz = klazz;
+  public RpcRequest(String sessionId, String serviceId, Class<?> klass, String method,
+      Class<?>[] argKlazz, Object[] args) {
+    this.sessionId = sessionId;
+    this.serviceId = serviceId;
+    this.klass = klass;
     this.method = method;
     this.argKlazz = argKlazz;
     this.args = args;
   }
 
-  public String getId() {
-    return id;
+  public String getSessionId() {
+    return sessionId;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setSessionId(String sessionId) {
+    this.sessionId = sessionId;
   }
 
-  public Class<?> getKlazz() {
-    return klazz;
+  public String getServiceId() {
+    return serviceId;
   }
 
-  public void setKlazz(Class<?> klazz) {
-    this.klazz = klazz;
+  public void setServiceId(String serviceId) {
+    this.serviceId = serviceId;
   }
 
-  public Method getMethod() {
+  public Class<?> getKlass() {
+    return klass;
+  }
+
+  public void setKlass(Class<?> klass) {
+    this.klass = klass;
+  }
+
+  public String getMethod() {
     return method;
   }
 
-  public void setMethod(Method method) {
+  public void setMethod(String method) {
     this.method = method;
   }
 

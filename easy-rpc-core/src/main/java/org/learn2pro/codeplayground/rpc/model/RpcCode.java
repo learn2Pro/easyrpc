@@ -9,6 +9,7 @@ public enum RpcCode {
    */
   SUCCESS(200, "succeed"),
   INTERNAL_ERROR(300, "internal error"),
+  REQUEST_ERROR(301, "request error"),
   NETWORK_ERROR(400, "network error"),
   SERVER_ERROR(500, "server error");
   /**
@@ -36,5 +37,9 @@ public enum RpcCode {
 
   public int getCode() {
     return code;
+  }
+
+  public String getMsg() {
+    return msg;
   }
 }

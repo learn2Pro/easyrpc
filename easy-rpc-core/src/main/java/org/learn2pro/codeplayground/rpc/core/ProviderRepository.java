@@ -1,16 +1,23 @@
 package org.learn2pro.codeplayground.rpc.core;
 
 import com.google.common.base.Preconditions;
+import java.lang.reflect.Method;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.learn2pro.codeplayground.rpc.config.RpcConfigServer;
 import org.learn2pro.codeplayground.rpc.core.ann.Provider;
+import org.learn2pro.codeplayground.rpc.model.RpcCode;
+import org.learn2pro.codeplayground.rpc.model.RpcRequest;
+import org.learn2pro.codeplayground.rpc.model.RpcResponse;
 import org.learn2pro.codeplayground.rpc.server.RemoteAddr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * the provider repo in [remote and local]
@@ -21,6 +28,7 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class ProviderRepository implements Repository, ApplicationContextAware, InitializingBean {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProviderRepository.class);
   private static final ProviderRepository INSTANCE = new ProviderRepository();
   /**
    * the app context in spring
@@ -40,6 +48,26 @@ public class ProviderRepository implements Repository, ApplicationContextAware, 
     return (T) app.getBean(name);
   }
 
+  /**
+   * invoke the rpc request
+   *
+   * @param request the request body
+   * @return the response
+   */
+  public RpcResponse invoke(RpcRequest request) {
+    if (null == request.getServiceId() || null == request.getSessionId()) {
+      return RpcResponse.parameterError(request.getSessionId());
+    }
+    Object instance = app.getBean(request.getServiceId(), request.getKlass());
+    Method m = ReflectionUtils
+        .findMethod(instance.getClass(), request.getMethod(), request.getArgKlazz());
+    if (m == null) {
+      return RpcResponse.parameterError(request.getSessionId());
+    }
+    Object ans = ReflectionUtils.invokeMethod(m, instance, request.getArgs());
+    LOGGER.info("provider:{}", request.getSessionId());
+    return new RpcResponse(request.getSessionId(), RpcCode.SUCCESS, ans);
+  }
 
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

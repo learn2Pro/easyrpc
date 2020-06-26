@@ -3,25 +3,17 @@ package org.learn2pro.codeplayground.rpc.core;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import org.learn2pro.codeplayground.rpc.core.abnormal.EasyException;
+import org.learn2pro.codeplayground.rpc.core.abnormal.EasyInvokeException;
 import org.springframework.util.ReflectionUtils;
 
-public class LocalInvocationWrapper implements InvocationHandler {
+public class LocalInvocationWrapper extends InvocationProxy implements InvocationHandler {
 
-  /**
-   * the target bean name
-   */
-  private String targetName;
-
-  public LocalInvocationWrapper(String targetName) {
-    this.targetName = targetName;
+  public LocalInvocationWrapper(String targetName, Class<?> target) {
+    super(targetName, target);
   }
 
-  public String getTargetName() {
-    return targetName;
-  }
-
-  public void setTargetName(String targetName) {
-    this.targetName = targetName;
+  public LocalInvocationWrapper() {
   }
 
   /**
@@ -35,7 +27,7 @@ public class LocalInvocationWrapper implements InvocationHandler {
    */
   public Object invoke(Object proxy, Method method, Object[] args) throws EasyException {
     try {
-      Object provider = ProviderRepository.getInstance().getByName(targetName);
+      Object provider = ProviderRepository.getInstance().getByName(getTargetName());
       return ReflectionUtils.invokeMethod(method, provider, args);
     } catch (Exception e) {
       throw new EasyInvokeException(

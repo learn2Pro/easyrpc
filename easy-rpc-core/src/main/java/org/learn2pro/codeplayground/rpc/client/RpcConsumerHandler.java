@@ -1,13 +1,12 @@
 package org.learn2pro.codeplayground.rpc.client;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.learn2pro.codeplayground.rpc.config.RpcConfigServer;
-import org.learn2pro.codeplayground.rpc.core.CodecRegistry;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.learn2pro.codeplayground.rpc.core.abnormal.EasyIOException;
 import org.learn2pro.codeplayground.rpc.model.RpcResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,15 +14,20 @@ import org.springframework.stereotype.Component;
  */
 @ChannelHandler.Sharable
 @Component
-public class RpcConsumerHandler extends SimpleChannelInboundHandler<ByteBuf> {
+public class RpcConsumerHandler extends ChannelInboundHandlerAdapter {
 
-  @Autowired
-  private RpcConfigServer rpcConfigServer;
+  private static final Logger LOGGER = LoggerFactory.getLogger(RpcConsumerHandler.class);
 
   @Override
-  protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-    RpcResponse response = (RpcResponse) CodecRegistry
-        .getInstance(rpcConfigServer.fetchCodec(), RpcResponse.class).decode(msg.array());
-
+  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    AsyncRpcMsgPool.getInstance().answer((RpcResponse) msg);
   }
+
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    LOGGER.error("[client]easy rpc invoke failed by io problems,pls check!", cause);
+    ctx.channel().close();
+    throw new EasyIOException("[client]easy rpc invoke failed by io problems,pls check!", cause);
+  }
+
 }

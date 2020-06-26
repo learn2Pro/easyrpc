@@ -2,21 +2,29 @@ package org.learn2pro.codeplayground.rpc.core;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
+import org.learn2pro.codeplayground.rpc.client.AsyncRpcMsgPool;
+import org.learn2pro.codeplayground.rpc.core.abnormal.EasyException;
+import org.learn2pro.codeplayground.rpc.model.RpcCode;
+import org.learn2pro.codeplayground.rpc.model.RpcRequest;
+import org.learn2pro.codeplayground.rpc.model.RpcResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @PACKAGE: org.learn2pro.codeplaygroud.rpc.core
  * @author: Dell
  * @DATE: 2020/6/23
  */
-public class RemoteInvocationWrapper implements InvocationHandler {
+public class RemoteInvocationWrapper extends InvocationProxy implements InvocationHandler {
 
-  /**
-   * remote target service
-   */
-  private String remoteTarget;
+  private static final Logger LOGGER = LoggerFactory.getLogger(RemoteInvocationWrapper.class);
 
-  public RemoteInvocationWrapper(String remoteTarget) {
-    this.remoteTarget = remoteTarget;
+  public RemoteInvocationWrapper(String targetName, Class<?> target) {
+    super(targetName, target);
+  }
+
+  public RemoteInvocationWrapper() {
   }
 
   /**
@@ -30,6 +38,22 @@ public class RemoteInvocationWrapper implements InvocationHandler {
    */
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    return null;
+    String sessionId = GeneratorRegistry.getInstance("UUID").generateId();
+    int size = args == null ? 0 : args.length;
+    Class<?>[] parameterTypes = new Class[size];
+    for (int i = 0; i < size; i++) {
+      parameterTypes[i] = args[i].getClass();
+    }
+
+    RpcRequest request = new RpcRequest(sessionId, getTargetName(), getTarget(), method.getName(),
+        parameterTypes, args);
+    LOGGER.info("client:{}", sessionId);
+    RpcResponse response = AsyncRpcMsgPool.getInstance().send(request)
+        .get();
+    if (response.getRpcCode() == RpcCode.SUCCESS) {
+      return response.getData();
+    } else {
+      throw new EasyException(response.getRpcCode().getMsg());
+    }
   }
 }

@@ -1,5 +1,6 @@
 package org.learn2pro.codeplayground.service;
 
+import org.learn2pro.codeplayground.rpc.core.ann.Provider;
 import org.springframework.stereotype.Service;
 
 /**
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
  * @author: Dell
  * @DATE: 2020/6/23
  */
+@Provider("localPongService")
 @Service("localPongService")
 public class LocalPongServiceImpl implements PongService {
 

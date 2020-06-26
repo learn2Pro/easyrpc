@@ -50,4 +50,12 @@ public class RpcResponse implements RpcSerModel {
   public void setData(Object data) {
     this.data = data;
   }
+
+  public static RpcResponse parameterError(String sessionId) {
+    return new RpcResponse(sessionId, RpcCode.REQUEST_ERROR, null);
+  }
+
+  public static RpcResponse networkError(String sessionId) {
+    return new RpcResponse(sessionId, RpcCode.NETWORK_ERROR, null);
+  }
 }

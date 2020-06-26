@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import org.learn2pro.codeplayground.rpc.server.RemoteAddr;
@@ -41,7 +42,15 @@ public class LocalConfigServer implements RpcConfigServer {
   public void register(RemoteAddr addr, String service, Class<?> klass) {
     Set<RemoteAddr> addrSet = configuration.getOrDefault(service, Sets.newHashSet());
     addrSet.add(addr);
+    configuration.put(service, addrSet);
     services.put(service, klass);
+  }
+
+  @Override
+  public void unregister(RemoteAddr addr) {
+    for (Entry<String, Set<RemoteAddr>> entry : configuration.entrySet()) {
+      entry.getValue().remove(addr);
+    }
   }
 
 }

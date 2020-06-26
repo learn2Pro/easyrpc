@@ -1,4 +1,5 @@
 import base.AbsBaseSpringTest;
+import java.util.concurrent.CountDownLatch;
 import org.junit.Test;
 import org.learn2pro.codeplayground.service.PingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,5 +17,18 @@ public class PingPongServiceTest extends AbsBaseSpringTest {
   @Test
   public void pingTest0() {
     pingService.ping();
+  }
+
+  @Test
+  public void pingTest1() throws InterruptedException {
+    CountDownLatch latch = new CountDownLatch(10);
+    for (int i = 0; i < 10; i++) {
+      new Thread(() -> {
+        pingService.ping();
+        latch.countDown();
+      }).start();
+    }
+    latch.await();
+    System.out.println("ending!");
   }
 }
