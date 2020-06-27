@@ -7,6 +7,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import java.net.InetSocketAddress;
 import javax.annotation.PreDestroy;
 import org.learn2pro.codeplayground.rpc.codec.CodecDecodeHandler;
@@ -59,9 +61,11 @@ public class ProviderRouter implements InitializingBean {
               @Override
               protected void initChannel(SocketChannel ch) throws Exception {
                 ch.pipeline()
-                    .addLast("encoder", codecEncodeHandler)
+                    .addLast("prepend", new LengthFieldPrepender(2))
+                    .addLast("remove", new LengthFieldBasedFrameDecoder(65536, 0, 2, 0, 2))
                     .addLast("decoder", new CodecDecodeHandler(rpcConfigServer.fetchCodec(),
                         RpcRequest.class))
+                    .addLast("encoder", codecEncodeHandler)
                     .addLast("rpc_provider", rpcProviderHandler);
               }
             });

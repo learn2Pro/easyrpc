@@ -21,7 +21,7 @@ public class PingPongServiceTest extends AbsBaseSpringTest {
 
   @Test
   public void pingTest1() throws InterruptedException {
-    CountDownLatch latch = new CountDownLatch(10);
+    final CountDownLatch latch = new CountDownLatch(10);
     for (int i = 0; i < 10; i++) {
       new Thread(() -> {
         pingService.ping();

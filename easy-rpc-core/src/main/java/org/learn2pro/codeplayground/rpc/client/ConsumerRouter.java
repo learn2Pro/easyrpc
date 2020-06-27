@@ -11,6 +11,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.PreDestroy;
@@ -19,7 +21,6 @@ import org.learn2pro.codeplayground.rpc.codec.CodecEncodeHandler;
 import org.learn2pro.codeplayground.rpc.config.RpcConfigServer;
 import org.learn2pro.codeplayground.rpc.core.ConsumerBeanPostProcessor;
 import org.learn2pro.codeplayground.rpc.core.abnormal.EasyNoProviderException;
-import org.learn2pro.codeplayground.rpc.model.RpcRequest;
 import org.learn2pro.codeplayground.rpc.model.RpcResponse;
 import org.learn2pro.codeplayground.rpc.server.RemoteAddr;
 import org.slf4j.Logger;
@@ -64,6 +65,8 @@ public class ConsumerRouter {
           @Override
           protected void initChannel(SocketChannel ch) throws Exception {
             ch.pipeline()
+                .addLast("prepend", new LengthFieldPrepender(2))
+                .addLast("remove", new LengthFieldBasedFrameDecoder(65536, 0, 2, 0, 2))
                 .addLast("decoding",
                     new CodecDecodeHandler(rpcConfigServer.fetchCodec(), RpcResponse.class))
                 .addLast("encoding", codecEncodeHandler)

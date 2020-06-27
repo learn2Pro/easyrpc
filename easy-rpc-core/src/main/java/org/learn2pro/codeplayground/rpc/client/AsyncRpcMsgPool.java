@@ -56,7 +56,6 @@ public class AsyncRpcMsgPool implements RpcMsgPool, InitializingBean, Disposable
     takeLock.lockInterruptibly();
     try {
       while (!responsePool.containsKey(requestId)) {
-        LOGGER.info("lock:{}", requestId);
         updated.await();
       }
       RpcResponse response = responsePool.get(requestId);
