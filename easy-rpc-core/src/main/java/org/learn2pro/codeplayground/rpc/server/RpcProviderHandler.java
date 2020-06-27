@@ -35,7 +35,6 @@ public class RpcProviderHandler extends ChannelInboundHandlerAdapter {
     SESSIONS.set(request.getSessionId());
     LOGGER.info("request [" + request.getSessionId() + "] is processing!");
     RpcResponse response = ProviderRepository.getInstance().invoke(request);
-    LOGGER.info("channel name:" + ctx.name());
     ctx.channel().writeAndFlush(response);
   }
 

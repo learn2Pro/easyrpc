@@ -58,7 +58,7 @@ public class ProviderRepository implements Repository, ApplicationContextAware, 
     if (null == request.getServiceId() || null == request.getSessionId()) {
       return RpcResponse.parameterError(request.getSessionId());
     }
-    Object instance = app.getBean(request.getServiceId(), request.getKlass());
+    Object instance = findInstance(request);
     Method m = ReflectionUtils
         .findMethod(instance.getClass(), request.getMethod(), request.getArgKlazz());
     if (m == null) {
@@ -67,6 +67,22 @@ public class ProviderRepository implements Repository, ApplicationContextAware, 
     Object ans = ReflectionUtils.invokeMethod(m, instance, request.getArgs());
     LOGGER.info("provider:{}", request.getSessionId());
     return new RpcResponse(request.getSessionId(), RpcCode.SUCCESS, ans);
+  }
+
+  /**
+   * find the provider instance in spring
+   *
+   * @param request the remote request
+   * @return the instance to call
+   */
+  private Object findInstance(RpcRequest request) {
+    Object instance;
+    try {
+      instance = app.getBean(request.getServiceId());
+    } catch (BeansException e) {
+      instance = app.getBean(request.getKlass());
+    }
+    return instance;
   }
 
   @Override

@@ -47,9 +47,8 @@ public class RemoteInvocationWrapper extends InvocationProxy implements Invocati
 
     RpcRequest request = new RpcRequest(sessionId, getTargetName(), getTarget(), method.getName(),
         parameterTypes, args);
-    LOGGER.info("client:{}", sessionId);
     RpcResponse response = AsyncRpcMsgPool.getInstance().send(request)
-        .get();
+        .get(3000, TimeUnit.MILLISECONDS);
     if (response.getRpcCode() == RpcCode.SUCCESS) {
       return response.getData();
     } else {

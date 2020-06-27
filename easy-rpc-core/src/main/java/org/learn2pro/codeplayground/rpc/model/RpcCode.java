@@ -9,7 +9,7 @@ public enum RpcCode {
    */
   SUCCESS(200, "succeed"),
   INTERNAL_ERROR(300, "internal error"),
-  REQUEST_ERROR(301, "request error"),
+  REQUEST_ERROR(301, "request parameter error"),
   NETWORK_ERROR(400, "network error"),
   SERVER_ERROR(500, "server error");
   /**

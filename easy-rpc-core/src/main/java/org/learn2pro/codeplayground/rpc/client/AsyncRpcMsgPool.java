@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import org.learn2pro.codeplayground.rpc.config.RpcConfigServer;
 import org.learn2pro.codeplayground.rpc.model.RpcRequest;
 import org.learn2pro.codeplayground.rpc.model.RpcResponse;
 import org.slf4j.Logger;
@@ -27,9 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AsyncRpcMsgPool implements RpcMsgPool, InitializingBean, DisposableBean {
 
   private static final AsyncRpcMsgPool INSTANCE = new AsyncRpcMsgPool();
-  private static final BlockingQueue<RpcRequest> requestQueue = new LinkedBlockingQueue<>(
-      100);
-  protected static final Map<String, RpcResponse> responsePool = Maps
+  private static final BlockingQueue<RpcRequest> REQUEST_QUEUE = new LinkedBlockingQueue<>(
+      10000);
+  protected static final Map<String, RpcRequest> REQUEST_MAP = Maps.newConcurrentMap();
+  protected static final Map<String, RpcResponse> RESPONSE_POOL = Maps
       .newConcurrentMap();
   private static final Logger LOGGER = LoggerFactory.getLogger(AsyncRpcMsgPool.class);
   /**
@@ -45,8 +45,6 @@ public class AsyncRpcMsgPool implements RpcMsgPool, InitializingBean, Disposable
 
   @Autowired
   private ConsumerRouter consumerRouter;
-  @Autowired
-  private RpcConfigServer rpcConfigServer;
 
   public static AsyncRpcMsgPool getInstance() {
     return INSTANCE;
@@ -55,11 +53,11 @@ public class AsyncRpcMsgPool implements RpcMsgPool, InitializingBean, Disposable
   private RpcResponse fetch(String requestId) throws InterruptedException {
     takeLock.lockInterruptibly();
     try {
-      while (!responsePool.containsKey(requestId)) {
+      while (!RESPONSE_POOL.containsKey(requestId)) {
         updated.await();
       }
-      RpcResponse response = responsePool.get(requestId);
-      responsePool.remove(requestId);
+      RpcResponse response = RESPONSE_POOL.get(requestId);
+      RESPONSE_POOL.remove(requestId);
       return response;
     } finally {
       takeLock.unlock();
@@ -76,23 +74,40 @@ public class AsyncRpcMsgPool implements RpcMsgPool, InitializingBean, Disposable
       throws InterruptedException, TimeoutException {
     takeLock.lockInterruptibly();
     try {
-      while (!responsePool.containsKey(requestId)) {
+      while (!RESPONSE_POOL.containsKey(requestId)) {
         if (!updated.await(timeout, TimeUnit.MILLISECONDS)) {
           throw new TimeoutException("fetch result timeout!");
         }
       }
-      RpcResponse response = responsePool.get(requestId);
-      responsePool.remove(requestId);
+      RpcResponse response = RESPONSE_POOL.get(requestId);
+      RESPONSE_POOL.remove(requestId);
+      REQUEST_MAP.remove(requestId);
       return response;
     } finally {
       takeLock.unlock();
     }
   }
 
+  /**
+   * send requst to server
+   *
+   * @param request the request info
+   * @return the future of response
+   */
+  public Future<RpcResponse> send(RpcRequest request) {
+    REQUEST_QUEUE.add(request);
+    REQUEST_MAP.put(request.getSessionId(), request);
+    return new RpcFuture(request.getSessionId());
+  }
+
   @Override
   public void answer(RpcResponse response) {
-    responsePool.put(response.getId(), response);
+    RESPONSE_POOL.put(response.getId(), response);
     signalNotEmpty();
+  }
+
+  public RpcRequest search(String sessionId) {
+    return REQUEST_MAP.get(sessionId);
   }
 
   /**
@@ -109,17 +124,6 @@ public class AsyncRpcMsgPool implements RpcMsgPool, InitializingBean, Disposable
     }
   }
 
-  /**
-   * send requst to server
-   *
-   * @param request the request info
-   * @return the future of response
-   */
-  public Future<RpcResponse> send(RpcRequest request) {
-    requestQueue.add(request);
-    return new RpcFuture(request.getSessionId());
-  }
-
   @Override
   @SuppressWarnings("unchecked")
   public void afterPropertiesSet() throws Exception {
@@ -129,7 +133,7 @@ public class AsyncRpcMsgPool implements RpcMsgPool, InitializingBean, Disposable
           if (stop) {
             return;
           }
-          RpcRequest request = requestQueue.take();
+          RpcRequest request = REQUEST_QUEUE.take();
           consumerRouter.choose(request.getServiceId()).writeAndFlush(request);
         }
       } catch (InterruptedException e) {
@@ -166,7 +170,7 @@ public class AsyncRpcMsgPool implements RpcMsgPool, InitializingBean, Disposable
 
     @Override
     public boolean isDone() {
-      return AsyncRpcMsgPool.responsePool.containsKey(requestId);
+      return AsyncRpcMsgPool.RESPONSE_POOL.containsKey(requestId);
     }
 
     @Override
